@@ -1,5 +1,3 @@
----
-
 # KXN
 
 **KXN** is a minimal 8bit stack-based virtual machine with a fully addressable 64Kb memory, a custom ISA, assembler, and a Tiny C-like compiler.
