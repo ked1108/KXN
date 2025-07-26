@@ -32,7 +32,7 @@ void emit_byte(uint8_t byte) {
 }
 
 void emit_word(uint16_t word) {
-    emit_byte(word & 0xFF);        // Little endian
+    emit_byte(word & 0xFF);        
     emit_byte((word >> 8) & 0xFF);
 }
 
@@ -83,15 +83,15 @@ int parse_number(const char* str) {
 }
 
 void trim_whitespace(char* str) {
-    // Remove leading whitespace
+    
     char* start = str;
     while (isspace(*start)) start++;
     
-    // Remove trailing whitespace
+    
     char* end = start + strlen(start) - 1;
     while (end > start && isspace(*end)) end--;
     
-    // Move string and null terminate
+    
     size_t len = end - start + 1;
     memmove(str, start, len);
     str[len] = '\0';
@@ -107,22 +107,22 @@ int assemble_file(const char* filename) {
     char line[MAX_LINE_LEN];
     int line_num = 0;
     
-    // First pass: collect labels
+    
     while (fgets(line, sizeof(line), file)) {
         line_num++;
         trim_whitespace(line);
         
-        // Skip empty lines and comments
+        
         if (line[0] == '\0' || line[0] == ';') continue;
         
-        // Check for label definition
+        
         char* colon = strchr(line, ':');
         if (colon) {
             *colon = '\0';
             trim_whitespace(line);
             add_label(line, output_pos);
             
-            // Process instruction after label if present
+            
             char* instruction = colon + 1;
             trim_whitespace(instruction);
             if (instruction[0] != '\0' && instruction[0] != ';') {
@@ -132,11 +132,11 @@ int assemble_file(const char* filename) {
             }
         }
         
-        // Parse instruction
+        
         char* token = strtok(line, " \t");
         if (!token) continue;
         
-        // Convert to uppercase
+        
         for (char* p = token; *p; p++) *p = toupper(*p);
         
         if (strcmp(token, "NOP") == 0) {
@@ -197,7 +197,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -208,7 +208,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -223,7 +223,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -234,7 +234,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -245,7 +245,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -256,7 +256,7 @@ int assemble_file(const char* filename) {
             if (token) {
                 if (isalpha(token[0])) {
                     add_label_ref(token, output_pos);
-                    emit_word(0); // Placeholder
+                    emit_word(0); 
                 } else {
                     emit_word(parse_number(token));
                 }
@@ -276,7 +276,6 @@ int assemble_file(const char* filename) {
     
     fclose(file);
     
-    // Patch label references
     patch_labels();
     
     return 0;

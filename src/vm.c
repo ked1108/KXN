@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Helper function to push a value onto the stack
 void vm_push(vm_t* vm, uint8_t value) {
 	if (vm->sp == 0) {
 		vm->error = VM_ERROR_STACK_OVERFLOW;
@@ -12,7 +11,6 @@ void vm_push(vm_t* vm, uint8_t value) {
 	vm->memory[vm->sp--] = value;
 }
 
-// Helper function to pop a value from the stack
 uint8_t vm_pop(vm_t* vm) {
 	if (vm->sp >= VM_STACK_TOP) {
 		vm->error = VM_ERROR_STACK_UNDERFLOW;
@@ -21,7 +19,6 @@ uint8_t vm_pop(vm_t* vm) {
 	return vm->memory[++vm->sp];
 }
 
-// Helper function to read 16-bit value (little endian)
 uint16_t vm_read16(vm_t* vm, uint16_t addr) {
 	if (addr >= VM_MEMORY_SIZE - 1) {
 		vm->error = VM_ERROR_INVALID_ADDRESS;
@@ -30,7 +27,6 @@ uint16_t vm_read16(vm_t* vm, uint16_t addr) {
 	return vm->memory[addr] | (vm->memory[addr + 1] << 8);
 }
 
-// Helper function to write 16-bit value (little endian)
 void vm_write16(vm_t* vm, uint16_t addr, uint16_t value) {
 	if (addr >= VM_MEMORY_SIZE - 1) {
 		vm->error = VM_ERROR_INVALID_ADDRESS;
@@ -40,19 +36,15 @@ void vm_write16(vm_t* vm, uint16_t addr, uint16_t value) {
 	vm->memory[addr + 1] = (value >> 8) & 0xFF;
 }
 
-// Initialize the virtual machine
 vm_error_t init_vm(vm_t* vm) {
-	// Clear memory
 	memset(vm->memory, 0, VM_MEMORY_SIZE);
 
-	// Initialize registers
 	vm->pc = 0;
 	vm->sp = VM_STACK_TOP;
 	vm->bp = VM_STACK_TOP;
 	vm->running = true;
 	vm->error = VM_OK;
 
-	// Initialize input state
 	vm->last_key = 0;
 	vm->key_available = false;
 	vm->mouse_x = 0;
@@ -61,12 +53,10 @@ vm_error_t init_vm(vm_t* vm) {
 	vm->mouse_event = false;
 	vm->waiting_for_input = false;
 
-	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
 		return VM_ERROR_SDL_INIT;
 	}
 
-	// Create window
 	vm->window = SDL_CreateWindow("8-bit VM", 
 															 SDL_WINDOWPOS_CENTERED, 
 															 SDL_WINDOWPOS_CENTERED,
@@ -78,7 +68,6 @@ vm_error_t init_vm(vm_t* vm) {
 		return VM_ERROR_SDL_INIT;
 	}
 
-	// Create renderer
 	vm->renderer = SDL_CreateRenderer(vm->window, -1, SDL_RENDERER_ACCELERATED);
 	if (!vm->renderer) {
 		SDL_DestroyWindow(vm->window);
@@ -86,7 +75,6 @@ vm_error_t init_vm(vm_t* vm) {
 		return VM_ERROR_SDL_INIT;
 	}
 
-	// Create texture for pixel buffer
 	vm->texture = SDL_CreateTexture(vm->renderer,
 																 SDL_PIXELFORMAT_ARGB8888,
 																 SDL_TEXTUREACCESS_STREAMING,
@@ -99,7 +87,6 @@ vm_error_t init_vm(vm_t* vm) {
 		return VM_ERROR_SDL_INIT;
 	}
 
-	// Allocate pixel buffer
 	vm->pixels = malloc(VM_DISPLAY_WIDTH * VM_DISPLAY_HEIGHT * sizeof(uint32_t));
 	if (!vm->pixels) {
 		SDL_DestroyTexture(vm->texture);
@@ -109,13 +96,11 @@ vm_error_t init_vm(vm_t* vm) {
 		return VM_ERROR_SDL_INIT;
 	}
 
-	// Clear pixel buffer to black
 	memset(vm->pixels, 0, VM_DISPLAY_WIDTH * VM_DISPLAY_HEIGHT * sizeof(uint32_t));
 
 	return VM_OK;
 }
 
-// Cleanup the virtual machine
 void cleanup_vm(vm_t* vm) {
 	if (vm->pixels) {
 		free(vm->pixels);
@@ -132,7 +117,6 @@ void cleanup_vm(vm_t* vm) {
 	SDL_Quit();
 }
 
-// Load program from file
 vm_error_t load_program(vm_t* vm, const char* filename) {
 	FILE* file = fopen(filename, "rb");
 	if (!file) {
@@ -149,7 +133,6 @@ vm_error_t load_program(vm_t* vm, const char* filename) {
 	return VM_OK;
 }
 
-// Draw a line using Bresenham's algorithm
 void draw_line(vm_t* vm, int x0, int y0, int x1, int y1, uint32_t color) {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
@@ -176,7 +159,6 @@ void draw_line(vm_t* vm, int x0, int y0, int x1, int y1, uint32_t color) {
 	}
 }
 
-// Handle system calls
 vm_error_t handle_syscall(vm_t* vm, uint8_t syscall_id) {
 	switch (syscall_id) {
 		case SYS_EXIT:
@@ -287,7 +269,6 @@ vm_error_t handle_syscall(vm_t* vm, uint8_t syscall_id) {
 	return VM_OK;
 }
 
-// Process SDL events
 void process_events(vm_t* vm) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
@@ -304,7 +285,7 @@ void process_events(vm_t* vm) {
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEMOTION:
-				vm->mouse_x = event.motion.x / 2; // Scale down by 2
+				vm->mouse_x = event.motion.x / 2; 
 				vm->mouse_y = event.motion.y / 2;
 				vm->mouse_buttons = SDL_GetMouseState(NULL, NULL);
 				vm->mouse_event = true;
@@ -313,7 +294,6 @@ void process_events(vm_t* vm) {
 	}
 }
 
-// Main execution loop
 vm_error_t run_vm(vm_t* vm) {
 	while (vm->running && vm->error == VM_OK) {
 		process_events(vm);
@@ -323,7 +303,6 @@ vm_error_t run_vm(vm_t* vm) {
 			continue;
     }
 
-		// Fetch instruction
 		if (vm->pc >= VM_MEMORY_SIZE) {
 			vm->error = VM_ERROR_INVALID_ADDRESS;
 			break;
@@ -331,10 +310,8 @@ vm_error_t run_vm(vm_t* vm) {
 
 		uint8_t opcode = vm->memory[vm->pc++];
 
-		// Decode and execute
 		switch (opcode) {
 			case OP_NOP:
-				// Do nothing
 				break;
 
 			case OP_HALT:
@@ -572,7 +549,6 @@ vm_error_t run_vm(vm_t* vm) {
 			case OP_CALL: {
 				uint16_t addr = vm_read16(vm, vm->pc);
 				vm->pc += 2;
-				// Push return address (little endian)
 				vm_push(vm, vm->pc & 0xFF);
 				vm_push(vm, (vm->pc >> 8) & 0xFF);
 				vm->pc = addr;
@@ -580,7 +556,6 @@ vm_error_t run_vm(vm_t* vm) {
 			}
 
 			case OP_RET: {
-				// Pop return address (little endian)
 				uint16_t addr = vm_pop(vm) << 8;
 				addr |= vm_pop(vm);
 				vm->pc = addr;
@@ -611,7 +586,6 @@ vm_error_t run_vm(vm_t* vm) {
 	return vm->error;
 }
 
-// Example main function
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
 		printf("Usage: %s <program_file>\n", argv[0]);
@@ -621,14 +595,12 @@ int main(int argc, char* argv[]) {
 	vm_t vm;
 	vm_error_t error;
 
-	// Initialize VM
 	error = init_vm(&vm);
 	if (error != VM_OK) {
 		printf("Failed to initialize VM: %d\n", error);
 		return 1;
 	}
 
-	// Load program
 	error = load_program(&vm, argv[1]);
 	if (error != VM_OK) {
 		printf("Failed to load program: %d\n", error);
@@ -636,7 +608,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	// Run VM
 	printf("Running VM...\n");
 	error = run_vm(&vm);
 
@@ -646,7 +617,6 @@ int main(int argc, char* argv[]) {
 		printf("VM error: %d\n", error);
 	}
 
-	// Cleanup
 	cleanup_vm(&vm);
 	return 0;
 }

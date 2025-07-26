@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
-// Memory and stack configuration
 #define VM_MEMORY_SIZE 65536
 #define VM_STACK_TOP 0xFFFF
 #define VM_DISPLAY_WIDTH 320
@@ -45,14 +44,14 @@
 
 // Opcodes - Memory
 #define OP_LOAD     0x18  // Push value at addr
-#define OP_STORE    0x19  // Pop value \u2192 store to addr
-#define OP_LOAD_IND 0x1A  // Pop addr \u2192 push value at addr
+#define OP_STORE    0x19  // Pop value store to addr
+#define OP_LOAD_IND 0x1A  // Pop addr push value at addr
 #define OP_STORE_IND 0x1B // Pop addr, pop val \u2192 store val to addr
 
 // Opcodes - Control Flow
 #define OP_JMP    0x1C  // Jump unconditionally
-#define OP_JZ     0x1D  // Pop \u2192 if zero, jump
-#define OP_JNZ    0x1E  // Pop \u2192 if not zero, jump
+#define OP_JZ     0x1D  // Pop if zero, jump
+#define OP_JNZ    0x1E  // Pop if not zero, jump
 #define OP_CALL   0x1F  // Call subroutine
 #define OP_RET    0x20  // Return from subroutine
 
@@ -67,14 +66,13 @@
 #define SYS_DRAW_LINE   0x11  // Draw line (pop x1,y1,x2,y2,color)
 #define SYS_FILL_RECT   0x12  // Fill rect (pop x,y,w,h,color)
 #define SYS_REFRESH     0x13  // Refresh display buffer
-#define SYS_POLL_KEY    0x20  // Poll keyboard \u2192 push 1 if key available
-#define SYS_GET_KEY     0x21  // Get key \u2192 push ASCII code
-#define SYS_POLL_MOUSE  0x22  // Poll mouse \u2192 push 1 if mouse event
-#define SYS_GET_MOUSE_X 0x23  // Get mouse X \u2192 push lo, hi
-#define SYS_GET_MOUSE_Y 0x24  // Get mouse Y \u2192 push lo, hi
-#define SYS_GET_MOUSE_B 0x25  // Get mouse buttons \u2192 push 8-bit flags
+#define SYS_POLL_KEY    0x20  // Poll keyboard push 1 if key available
+#define SYS_GET_KEY     0x21  // Get key push ASCII code
+#define SYS_POLL_MOUSE  0x22  // Poll mouse push 1 if mouse event
+#define SYS_GET_MOUSE_X 0x23  // Get mouse X push lo, hi
+#define SYS_GET_MOUSE_Y 0x24  // Get mouse Y push lo, hi
+#define SYS_GET_MOUSE_B 0x25  // Get mouse buttons push 8-bit flags
 
-// VM Error codes
 typedef enum {
     VM_OK = 0,
     VM_ERROR_STACK_OVERFLOW,
@@ -86,14 +84,13 @@ typedef enum {
     VM_ERROR_SDL_INIT
 } vm_error_t;
 
-// VM State structure
 typedef struct {
-    uint8_t memory[VM_MEMORY_SIZE];  // 64KB of memory
-    uint16_t pc;                     // Program counter
-    uint16_t sp;                     // Stack pointer
-    uint16_t bp;                     // Base pointer (optional)
-    bool running;                    // VM running state
-    vm_error_t error;               // Last error
+    uint8_t memory[VM_MEMORY_SIZE];  
+    uint16_t pc;                    
+    uint16_t sp;                   
+    uint16_t bp;                  
+    bool running;                
+    vm_error_t error;           
     
     // SDL graphics
     SDL_Window* window;
@@ -101,7 +98,6 @@ typedef struct {
     SDL_Texture* texture;
     uint32_t* pixels;
     
-    // Input state
     uint8_t last_key;
     bool key_available;
     int mouse_x, mouse_y;
@@ -110,7 +106,6 @@ typedef struct {
 		bool waiting_for_input;
 } vm_t;
 
-// Function declarations
 vm_error_t init_vm(vm_t* vm);
 void cleanup_vm(vm_t* vm);
 vm_error_t load_program(vm_t* vm, const char* filename);
