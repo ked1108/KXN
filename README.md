@@ -2,9 +2,7 @@
 
 **KXN** is a minimal 8bit stack-based virtual machine with a fully addressable 64Kb memory, a custom ISA, assembler, and a Tiny C-like compiler.
 It has supports basic arithmetic, logic, control flow, memory, and SDL2-based graphics operations.
-The project is inspired by [uxn](https://100r.co/site/uxn.html).
----
-
+The project is inspired by [uxn](https://100r.co/site/uxn.html) and [paper computing](https://wiki.xxiivv.com/site/paper_computing.html) and I do recommend everyone to check them out.
 
 ## Build
 
