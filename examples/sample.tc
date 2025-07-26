@@ -1,0 +1,23 @@
+// Example TinyC program - draws pixels in a loop
+var x = 0;
+var y = 50;
+
+while (x < 100) {
+    draw_pixel(x, y, 255);  // Draw white pixel
+    x = x + 1;
+}
+
+// Draw a diagonal line
+var i = 0;
+while (i < 50) {
+    draw_pixel(i, i, 128);  // Draw gray pixel
+    i = i + 1;
+}
+
+refresh();
+
+var key = 0;
+key = read_char();
+print_char(key);
+
+halt();
