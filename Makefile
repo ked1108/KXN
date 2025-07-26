@@ -33,6 +33,11 @@ install: all
 	install -m 755 kxasm $(BIN_DIR)
 	install -m 755 tinyc $(BIN_DIR)
 
+uninstall:
+	rm -f $(BIN_DIR)/vxn
+	rm -f $(BIN_DIR)/vxasm
+	rm -f $(BIN_DIR)/tinyc
+
 clean:
 	rm -f kxn kxasm tinyc
 
