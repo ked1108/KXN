@@ -66,7 +66,7 @@ make clean          # Remove compiled binaries
 
 ---
 
-## System Calls
+## IO Calls
 
 | ID   | Description                            |
 | ---- | -------------------------------------- |
