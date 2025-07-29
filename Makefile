@@ -1,44 +1,58 @@
-CC = cc
-CFLAGS = -Wall -Wextra -O2
-LIBS = -lSDL2 -lm
+CC = clang
+CFLAGS = -Wall -Wextra -std=c99 -O2 -g
+INCLUDES = -Iinclude
 
-# Detect operating system for SDL2 linking
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-    # macOS
-    LIBS += -framework Cocoa
-    CFLAGS += -I/usr/local/include -L/usr/local/lib
+PLATFORM ?= sdl2
+
+VM_SOURCES = src/vm.c
+COMMON_HEADERS = src/vm.h src/platform_io.h
+
+ifeq ($(PLATFORM),sdl2)
+    PLATFORM_SOURCES = src/platforms/sdl2/platform_io.c
+    PLATFORM_LIBS = -lSDL2
+    TARGET = kxn-vm-sdl2
+    PLATFORM_CFLAGS = 
 endif
 
-# Directories
-SRC_DIR = src
-PREFIX = /usr/local
-BIN_DIR = $(PREFIX)/bin
+# All sources
+SOURCES = $(VM_SOURCES) $(PLATFORM_SOURCES)
+OBJECTS = $(SOURCES:.c=.o)
 
-# Targets
-all: kxn kxasm tinyc
+# Build targets
+.PHONY: all clean sdl2 esp32 install
 
-kxn: $(SRC_DIR)/vm.c $(SRC_DIR)/vm.h $(SRC_DIR)/platform_io.c $(SRC_DIR)/platform_io.h
-	$(CC) $(CFLAGS) -o kxn $(SRC_DIR)/vm.c $(SRC_DIR)/platform_io.c $(LIBS)
+all: $(TARGET)
 
-kxasm: $(SRC_DIR)/assembler.c $(SRC_DIR)/vm.h
-	$(CC) $(CFLAGS) -o kxasm $(SRC_DIR)/assembler.c
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(TARGET) $(PLATFORM_LIBS)
+	@echo "Built $(TARGET) for $(PLATFORM) platform"
 
-tinyc: $(SRC_DIR)/compiler.c
-	$(CC) $(CFLAGS) -o tinyc $(SRC_DIR)/compiler.c -g
+%.o: %.c $(COMMON_HEADERS)
+	$(CC) $(CFLAGS) $(PLATFORM_CFLAGS) $(INCLUDES) -c $< -o $@
 
-install: all
-	install -d $(BIN_DIR)
-	install -m 755 kxn $(BIN_DIR)
-	install -m 755 kxasm $(BIN_DIR)
-	install -m 755 tinyc $(BIN_DIR)
-
-uninstall:
-	rm -f $(BIN_DIR)/vxn
-	rm -f $(BIN_DIR)/vxasm
-	rm -f $(BIN_DIR)/tinyc
+sdl2:
+	$(MAKE) PLATFORM=sdl2
 
 clean:
-	rm -f kxn kxasm tinyc
+	rm -f $(OBJECTS) kxn-vm-* 
+	@echo "Cleaned build artifacts"
 
-.PHONY: all clean install
+install: $(TARGET)
+	sudo cp $(TARGET) /usr/local/bin/
+	@echo "Installed $(TARGET) to /usr/local/bin/"
+
+
+# Development help
+.PHONY: help
+help:
+	@echo "KXN VM Build System"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all        - Build for default platform (SDL2)"
+	@echo "  sdl2       - Build for SDL2 platform"
+	@echo "  clean      - Remove build artifacts"
+	@echo "  install    - Install to system"
+	@echo "  examples   - Show example usage"
+	@echo ""
+	@echo "Platform selection:"
+	@echo "  make PLATFORM=sdl2   - Build SDL2 version"
