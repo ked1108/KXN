@@ -10,7 +10,7 @@ COMMON_HEADERS = src/vm.h src/platform_io.h
 ifeq ($(PLATFORM),sdl2)
     PLATFORM_SOURCES = src/platforms/sdl2/platform_io.c
     PLATFORM_LIBS = -lSDL2
-    TARGET = kxn-vm-sdl2
+    TARGET = kxn
     PLATFORM_CFLAGS = 
 endif
 
@@ -34,7 +34,7 @@ sdl2:
 	$(MAKE) PLATFORM=sdl2
 
 clean:
-	rm -f $(OBJECTS) kxn-vm-* 
+	rm -f $(OBJECTS) kxn 
 	@echo "Cleaned build artifacts"
 
 install: $(TARGET)

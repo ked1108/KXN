@@ -3,8 +3,8 @@
  * This file contains all SDL2-specific code for graphics, input, and system operations.
  */
 
-#include "platform_io.h"
-#include "vm.h"
+#include "../../platform_io.h"
+#include "../../vm.h"
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
