@@ -18,8 +18,8 @@ BIN_DIR = $(PREFIX)/bin
 # Targets
 all: kxn kxasm tinyc
 
-kxn: $(SRC_DIR)/vm.c $(SRC_DIR)/vm.h
-	$(CC) $(CFLAGS) -o kxn $(SRC_DIR)/vm.c $(LIBS)
+kxn: $(SRC_DIR)/vm.c $(SRC_DIR)/vm.h $(SRC_DIR)/platform_io.c $(SRC_DIR)/platform_io.h
+	$(CC) $(CFLAGS) -o kxn $(SRC_DIR)/vm.c $(SRC_DIR)/platform_io.c $(LIBS)
 
 kxasm: $(SRC_DIR)/assembler.c $(SRC_DIR)/vm.h
 	$(CC) $(CFLAGS) -o kxasm $(SRC_DIR)/assembler.c

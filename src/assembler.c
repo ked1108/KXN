@@ -264,7 +264,7 @@ int assemble_file(const char* filename) {
         } else if (strcmp(token, "RET") == 0) {
             emit_byte(OP_RET);
         } else if (strcmp(token, "SYS") == 0) {
-            emit_byte(OP_SYS);
+            emit_byte(OP_IO);
             token = strtok(NULL, " \t");
             if (token) {
                 emit_byte(parse_number(token));
